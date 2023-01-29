@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carros.com</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <span>Carros.com</span>
+      <button onclick="modalPesquisa()" id="new">Pesquisar Carro</i></button>
+      <button onclick="modalCadastro()" id="new">Cadastrar Carro</i></button>
+    </div>
+    
+    <div class="divTable">
+      <table>
+        <thead>
+          <tr>
+            <th>ID do Carro</th>
+            <th>Código do Carro</th>
+            <th>Nome do Carro</th>
+            <th>Valor do Carro</th>
+            <th>MarketPlace</th>
+            <th>Site</th>
+            <th>Anuncio</th>
+            <th class="acao">Editar</th>
+              <th class="acao">Excluir</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="modal-container">
+      <div class="modal">
+        <h1 id="modalTitle"> </h1>
+        <form id="formModal">
+          <label for="m-codConcess">Código do Carro</label>
+          <input id="m-codConcess" type="text" />
+
+          <label for="m-nomeCar">Nome do Carro</label>
+          <input id="m-nomeCar" type="text" />
+
+          <label for="m-valorCar">Valor do Carro</label>
+          <input id="m-valorCar" type="number" />
+
+          <div class="plataformaCheck">
+            <div>
+              <label for="marketPlace">MarketPlace</label>
+              <input type="checkbox" id="marketPlace" class="plataformaInput" name="marketPlace" >
+            </div>
+            <div>
+              <label for="site">Site</label>
+              <input type="checkbox" id="site" class="plataformaInput" name="site" >
+            </div>
+            <div>
+              <label for="anuncio">Anuncio</label>
+              <input type="checkbox" id="anuncio" class="plataformaInput" name="anuncio">
+            </div>
+          </div>
+        </form>
+        <button class="modalButton"></button>
+      </div>
+    </div>
+
+    <div class="deleteModalContainer">
+      <div class="deleteModal">
+        <h1>Tem certeza?</h1>
+        <button id="btnDelete" type="button">Deletar</button>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
