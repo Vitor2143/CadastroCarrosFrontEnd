@@ -10,6 +10,7 @@ const sSite = document.querySelector('#site')
 const sAnuncio = document.querySelector('#anuncio')
 const formModal = document.querySelector('#formModal')
 
+let itemIdGlobal = null
 let dadosdaAPI
 let itens
 let id
@@ -21,26 +22,37 @@ function openModal() {
     modal.onclick = e => {
         if (e.target.className.indexOf('modal-container') !== -1) {
             modal.classList.remove('active')
+            itemIdGlobal = null
+            console.log(itemIdGlobal)
         }
     }
 }
 
 function deleteModal() {
     sDeleteModal.classList.add('active')
-
     sDeleteModal.onclick = e => {
         if (e.target.className.indexOf('deleteModalContainer') !== -1) {
             sDeleteModal.classList.remove('active')
+            itemIdGlobal = null
+            window.location.reload()
+
+
         }
     }
 }
 
+
 function deleteConfirm(itemId) {
-    deleteModal()
-    const btnDelete = document.querySelector('#btnDelete')
-    btnDelete.addEventListener('click', async () => {
-        deleteItem(itemId)
-    })
+    if (itemIdGlobal !== itemId) {
+        itemIdGlobal = itemId;
+        deleteModal()
+        const btnDelete = document.querySelector('#btnDelete')
+        btnDelete.addEventListener('click', async () => {
+            deleteItem(itemIdGlobal)
+            window.location.reload()
+        }
+        );
+    }
 }
 
 function modalUpdate(itemId) {
@@ -49,23 +61,24 @@ function modalUpdate(itemId) {
     const btnUpdate = document.querySelector('#btnUpdate')
     btnUpdate.addEventListener('click', () => {
         try {
-            let codConc = sCodConc.value
-            let nomeCar = sNomeCar.value
-            let valorCar = parseInt(sValorCar.value)
-            let marketPlace = sMarketPlace.checked
-            let site = sSite.checked
-            let anuncio = sAnuncio.checked
+            let codConc = document.querySelector('#m-codConcess').value
+            let nomeCar = document.querySelector('#m-nomeCar').value
+            let valorCar = parseInt(document.querySelector('#m-valorCar').value)
+            let marketPlace = document.querySelector('#marketPlace').checked
+            let site = document.querySelector('#site').checked
+            let anuncio = document.querySelector('#anuncio').checked
 
             let dados = {
-                nomeCarro: nomeCar,
                 codigoConcess: codConc,
+                nomeCarro: nomeCar,
                 valorCarro: valorCar,
                 marketPlace: marketPlace,
                 site: site,
                 anuncio: anuncio,
             };
-            id = itemId
-            updateItem(dados);
+
+            updateItem(dados, itemId);
+            window.location.reload()
         }
         catch (Error) {
             console.log(Error);
@@ -80,12 +93,12 @@ function modalCadastro() {
     const btnSalvar = document.querySelector('#btnSalvar')
     btnSalvar.addEventListener('click', async () => {
         try {
-            let codConc = sCodConc.value
-            let nomeCar = sNomeCar.value
-            let valorCar = parseInt(sValorCar.value)
-            let marketPlace = sMarketPlace.checked
-            let site = sSite.checked
-            let anuncio = sAnuncio.checked
+            let codConc = document.querySelector('#m-codConcess').value
+            let nomeCar = document.querySelector('#m-nomeCar').value
+            let valorCar = parseInt(document.querySelector('#m-valorCar').value)
+            let marketPlace = document.querySelector('#marketPlace').checked
+            let site = document.querySelector('#site').checked
+            let anuncio = document.querySelector('#anuncio').checked
 
             let carro = {
                 codigoConcess: codConc,
@@ -95,8 +108,9 @@ function modalCadastro() {
                 site: site,
                 anuncio: anuncio,
             };
-            addNewItem(carro);
 
+            addNewItem(carro);
+            window.location.reload()
         } catch (Error) {
             console.log(Error.response.data);
             console.log(Error.response.status);
@@ -113,7 +127,7 @@ function modificaModalCadastro() {
     modalTitle.innerHTML = 'Cadastrar um carro'
     modalButton.innerHTML = 'Salvar'
     modalButton.setAttribute('id', 'btnSalvar')
-    modalButton.setAttribute('type', 'button')
+    modalButton.setAttribute('type', 'submit')
 }
 
 function modificaModalUpdate() {
@@ -123,7 +137,7 @@ function modificaModalUpdate() {
     modalTitle.innerHTML = 'Atualizar um carro'
     modalButton.innerHTML = 'Atualizar'
     modalButton.setAttribute('id', 'btnUpdate')
-    modalButton.setAttribute('type', 'button')
+    modalButton.setAttribute('type', 'submit')
 }
 
 function modificaModalDelete() {
@@ -159,7 +173,8 @@ function modalPesquisa() {
             const dados = {
                 codigoConcess: codConc
             }
-            //getOneItem(dados)
+            getOneItem(dados)
+            modal.classList.remove('active')
 
         } catch (error) {
             console.log(error)
@@ -193,18 +208,13 @@ function retornaModalPadrao() {
     </div>`)
 }
 
-
-
-
-
 //FUNCAO CRIA TABELA
 function insertItem(item, itemId) {
 
     try {
         let tr = document.createElement('tr')
 
-        tr.innerHTML = `
-            <td> ${item.id} </td>
+        tr.innerHTML = `    
             <td> ${item.codigoConcess} </td>
             <td> ${item.nomeCarro} </td>
             <td> ${item.valorCarro} </td>
@@ -226,7 +236,6 @@ function insertItem(item, itemId) {
 
 
 //FUNCAO CARREGA ITENS
-let itemId
 function loadItens() {
     let data
     axios.get('http://localhost:3000/lista')
@@ -236,6 +245,7 @@ function loadItens() {
             index = -1
             tbody.innerHTML = ''
             for (let item of data) {
+                let itemId
                 index += 1
                 itemId = (dadosdaAPI[index].id)
                 insertItem(item, itemId)
@@ -253,21 +263,35 @@ function loadItens() {
 
 //POST CADASTRO ITENS
 const addNewItem = async (carro) => {
-    try {
-        axios.post(`${url}/cadastrar`, carro).then(alert('Carro Cadastrado'));
-    } catch (Error) {
-        console.log('nao cadastrado')
-    }
+
+    axios.post(`${url}/cadastrar`, carro)
+        .then(alert('Carro Cadastrado'))
+        .catch(error => {
+            alert('Não foi possível Cadastrar, Erro: ', error)
+            if (error.response) {
+                console.error(error.response.data);
+                console.error(error.response.status);
+                console.error(error.response.headers);
+            }
+        });
+
 };
 
 //PUT ATUALIZA ITENS
-const updateItem = async (dados) => {
+const updateItem = async (dados, itemId) => {
     axios
-        .put(`${url}/atualizar/${id}`, dados)
+        .put(`${url}/atualizar/${itemId}`, dados)
         .then(() => {
             alert('Dados Atualizados');
         })
-        .catch((error) => console.log(error));
+        .catch(error => {
+            alert('Não foi possível atualizar, Erro: ', error)
+            if (error.response) {
+                console.error(error.response.data);
+                console.error(error.response.status);
+                console.error(error.response.headers);
+            }
+        });
 }
 
 //DELETE ITEM
@@ -278,7 +302,14 @@ const deleteItem = async (itemId) => {
         .then(() => {
             alert('Dados Deletados');
         })
-        .catch((error) => console.log(error));
+        .catch(error => {
+            alert('Não foi possível deletar, Erro: ', error)
+            if (error.response) {
+                console.error(error.response.data);
+                console.error(error.response.status);
+                console.error(error.response.headers);
+            }
+        });
 }
 
 //FIND ITEM
@@ -288,21 +319,27 @@ const getOneItem = async (dados) => {
     axios
         .post(`${url}/pesquisa`, dados)
         .then((response) => {
-            console.log(dados)
+
             dadosdaAPI = response.data;
             data = response.data;
-            console.log(data)
             index = -1
             tbody.innerHTML = ''
             for (let item of data) {
                 index += 1
-                console.log(index)
                 itemId = (dadosdaAPI[index].id)
                 insertItem(item, itemId)
             }
 
         })
-        .catch((error) => console.log(error));
+        .catch(error => {
+            alert('Não foi possível Pesquisar, Erro: ', error)
+            if (error.response) {
+                console.error(error.response.data);
+                console.error(error.response.status);
+                console.error(error.response.headers);
+            }
+        });
 };
+
 
 loadItens()
